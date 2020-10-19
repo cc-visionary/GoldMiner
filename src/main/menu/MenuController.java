@@ -26,7 +26,10 @@ public class MenuController {
         Stage primaryStage = (Stage) ((Node) ae.getSource()).getScene().getWindow();
         Parent root = generateGameScreenLoader(choice).load();
 
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("/main/gameScreen/GameScreen.css");
+
+        primaryStage.setScene(scene);
     }
 
     private FXMLLoader generateGameScreenLoader(char choice) {
