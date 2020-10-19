@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox spacing="5.0">
+         <children>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Skip" />
+            <CheckBox mnemonicParsing="false" text="Auto-Skip" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
