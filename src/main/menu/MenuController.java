@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.gameScreen.GameScreenController;
+import main.model.Board;
 
 import java.io.IOException;
 

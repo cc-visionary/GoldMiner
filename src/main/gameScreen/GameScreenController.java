@@ -10,8 +10,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import main.model.Board;
+import main.model.BoardSpace;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class GameScreenController implements Initializable {
@@ -24,30 +27,30 @@ public class GameScreenController implements Initializable {
     @FXML
     private GridPane board;
 
-    private int n;
+    private Board gameBoard;
 
     public GameScreenController(int n, char choice) {
-        this.n = n;
+        gameBoard = new Board(n);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        generateBoard(n);
+        generateBoard();
     }
 
     /**
      * Generates the board into the Game Screen
-     * @param n determines the size of the board as n (width) x n (height) board
+     * through looping the 2-dimensional ArrayList of the Board
      */
-    public void generateBoard(int n) {
-        for(int i = 0; i < n; i++) {
-            RowConstraints row = new RowConstraints(50);
-            ColumnConstraints column = new ColumnConstraints(50);
-            board.getRowConstraints().add(row);
-            board.getColumnConstraints().add(column);
-            for(int j = 0; j < n; j++) {
-                Label label = new Label(" ");
-                board.add(label, i, j);
+    public void generateBoard() {
+        for(ArrayList<BoardSpace> row : gameBoard.getBoard()) {
+            RowConstraints rowConstraints = new RowConstraints(50);
+            ColumnConstraints columnConstraints = new ColumnConstraints(50);
+            board.getRowConstraints().add(rowConstraints);
+            board.getColumnConstraints().add(columnConstraints);
+            for(BoardSpace column : row) {
+                Label label = new Label(column.getRow() + " " + column.getColumn());
+                board.add(label, column.getRow(), column.getColumn());
             }
         }
     }
