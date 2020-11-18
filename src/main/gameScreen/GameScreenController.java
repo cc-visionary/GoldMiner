@@ -12,6 +12,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import main.model.Board;
 import main.model.BoardSpace;
+import main.model.boardItems.Beacon;
+import main.model.boardItems.GoldPot;
+import main.model.boardItems.Miner;
+import main.model.boardItems.Pit;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,8 +53,14 @@ public class GameScreenController implements Initializable {
             board.getRowConstraints().add(rowConstraints);
             board.getColumnConstraints().add(columnConstraints);
             for(BoardSpace column : row) {
-                Label label = new Label(column.getRow() + " " + column.getColumn());
-                board.add(label, column.getRow(), column.getColumn());
+                if(column.getBoardItem() != null) {
+                    Label label = new Label(column.getRow() + " " + column.getColumn());
+                    if (column.getBoardItem() instanceof Beacon) label = new Label("B");
+                    else if (column.getBoardItem() instanceof Pit) label = new Label("P");
+                    else if (column.getBoardItem() instanceof GoldPot) label = new Label("G");
+                    else if (column.getBoardItem() instanceof Miner) label = new Label("M");
+                    board.add(label, column.getRow(), column.getColumn());
+                }
             }
         }
     }

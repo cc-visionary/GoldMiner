@@ -4,18 +4,18 @@ import main.model.Board;
 
 abstract public class BoardItem {
     int xPos, yPos;
-    Board board;
+    boolean movable;
 
-    public BoardItem(Board board, int xPos, int yPos) {
-        this.board = board;
+    public BoardItem(int xPos, int yPos, boolean movable) {
         this.xPos = xPos;
         this.yPos = yPos;
+        this.movable = movable;
     }
 
-    public BoardItem(Board board) {
-        this.board = board;
-        this.xPos = 0;
-        this.yPos = 0;
+    public BoardItem(int xPos, int yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.movable = false;
     }
 
     public void setXPos(int xPos) {
@@ -32,5 +32,9 @@ abstract public class BoardItem {
 
     public int getYPos() {
         return yPos;
+    }
+
+    public boolean isMovable() {
+        return movable;
     }
 }

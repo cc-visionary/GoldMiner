@@ -11,6 +11,7 @@ public class BoardSpace {
         this.row = row;
         this.column = column;
     }
+
     public BoardSpace(int row, int column) {
         this.row = row;
         this.column = column;

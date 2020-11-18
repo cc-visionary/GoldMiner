@@ -3,7 +3,7 @@ package main.model.boardItems;
 import main.model.Board;
 
 final public class Pit extends BoardItem {
-    public Pit(Board board) {
-        super(board);
+    public Pit(int xPos, int yPos) {
+        super(xPos, yPos);
     }
 }
