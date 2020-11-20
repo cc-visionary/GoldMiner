@@ -2,23 +2,27 @@ package main.model;
 
 import main.model.boardItems.BoardItem;
 
+import java.util.ArrayList;
+
 public class BoardSpace {
-    private BoardItem boardItem;
+    private ArrayList<BoardItem> boardItems;
     private int row, column;
 
     public BoardSpace(BoardItem boardItem, int row, int column) {
-        this.boardItem = boardItem;
+        this.boardItems = new ArrayList<BoardItem>();
+        this.boardItems.add(boardItem);
         this.row = row;
         this.column = column;
     }
 
     public BoardSpace(int row, int column) {
+        this.boardItems = new ArrayList<BoardItem>();
         this.row = row;
         this.column = column;
     }
 
-    public BoardItem getBoardItem() {
-        return boardItem;
+    public ArrayList<BoardItem> getBoardItems() {
+        return boardItems;
     }
 
     public int getRow() {
@@ -29,11 +33,11 @@ public class BoardSpace {
         return column;
     }
 
-    public void setBoardItem(BoardItem boardItem) {
-        this.boardItem = boardItem;
+    public void addBoardItem(BoardItem boardItem) {
+        this.boardItems.add(boardItem);
     }
 
-    public void removeBoardItem() {
-        setBoardItem(null);
+    public void removeBoardItem(BoardItem boardItem) {
+        this.boardItems.remove(boardItem);
     }
 }

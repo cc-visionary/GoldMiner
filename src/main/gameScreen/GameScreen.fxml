@@ -6,9 +6,12 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <GridPane fx:id="board" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="0.0" gridLinesVisible="true" />
+      <GridPane fx:id="board" alignment="CENTER" gridLinesVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="0.0" />
       <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
+            <Button fx:id="scanButton" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scan" text="Scan" />
+            <Button fx:id="rotateButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#rotate" text="Rotate" />
+            <Button fx:id="frontButton" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#front" text="Front" />
             <Button fx:id="skipButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#skipMove" text="Skip" />
             <CheckBox fx:id="autoskipCheckbox" mnemonicParsing="false" text="Auto-Skip" />
          </children>

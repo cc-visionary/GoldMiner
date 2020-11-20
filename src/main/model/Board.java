@@ -84,6 +84,12 @@ public class Board {
         return storage;
     }
 
+    /**
+     * Generates a unique number whose positions isn't taken yet
+     * @param upperBound     maximum number
+     * @param positionsTaken positions which were already taken
+     * @return               unique number which isn't taken yet
+     */
     private int generateUniqueRandomPosition(int upperBound, ArrayList<Integer> positionsTaken) {
         Random randomizer = new Random();
         int position;
@@ -112,7 +118,10 @@ public class Board {
      */
     public void moveBoardItem(BoardItem boardItem, int xPos, int yPos) {
         if(boardItem.isMovable()) {
-
+            board.get(boardItem.getYPos()).get(boardItem.getXPos()).removeBoardItem(boardItem);
+            board.get(yPos).get(xPos).addBoardItem(boardItem);
+            boardItem.setXPos(xPos);
+            boardItem.setYPos(yPos);
         }
     }
 

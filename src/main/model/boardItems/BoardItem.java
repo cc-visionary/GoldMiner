@@ -3,8 +3,9 @@ package main.model.boardItems;
 import main.model.Board;
 
 abstract public class BoardItem {
-    int xPos, yPos;
-    boolean movable;
+    private String type;
+    private int xPos, yPos;
+    private boolean movable;
 
     public BoardItem(int xPos, int yPos, boolean movable) {
         this.xPos = xPos;
@@ -13,6 +14,7 @@ abstract public class BoardItem {
     }
 
     public BoardItem(int xPos, int yPos) {
+        this.type = type;
         this.xPos = xPos;
         this.yPos = yPos;
         this.movable = false;
