@@ -43,6 +43,7 @@ final public class Miner extends BoardItem {
                 else System.out.println("Can't move the miner 1 step down");
                 break;
         }
+        board.getStatistics().addFront();
     }
 
     /**
@@ -69,6 +70,7 @@ final public class Miner extends BoardItem {
             default:
                 System.out.println("Direction is not in the choices.");
         }
+        board.getStatistics().addRotate();
     }
 
     /**
@@ -92,6 +94,7 @@ final public class Miner extends BoardItem {
                 result = scanRight(getYPos(), getXPos());
                 break;
         }
+        board.getStatistics().addScan();
 
         return result;
     }
@@ -170,6 +173,30 @@ final public class Miner extends BoardItem {
         }
 
         return -1;
+    }
+
+    /**
+     * Determines whether or not the player has failed at the pit or not
+     * @return yes/no
+     */
+    public boolean didFallOnPit() {
+        for(BoardItem boardItem : board.getBoard().get(getYPos()).get(getXPos()).getBoardItems()) {
+            if(boardItem instanceof Pit) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether or not the player has reached the gold pot and won or not
+     * @return yes/no
+     */
+    public boolean didReachGoldPot() {
+        for(BoardItem boardItem : board.getBoard().get(getYPos()).get(getXPos()).getBoardItems()) {
+            if(boardItem instanceof GoldPot) return true;
+        }
+
+        return false;
     }
 
     public char getDirection() {

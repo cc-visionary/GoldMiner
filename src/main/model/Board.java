@@ -9,8 +9,10 @@ import java.util.Random;
 public class Board {
     private ArrayList<ArrayList<BoardSpace>> board;
     private Miner miner;
+    private Statistics statistics;
 
     public Board(int n) {
+        this.statistics = new Statistics();
         this.miner = new Miner(this);
         this.board = new ArrayList<>();
 
@@ -127,5 +129,9 @@ public class Board {
 
     public Miner getMiner() {
         return miner;
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
     }
 }

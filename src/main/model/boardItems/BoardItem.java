@@ -1,9 +1,6 @@
 package main.model.boardItems;
 
-import main.model.Board;
-
 abstract public class BoardItem {
-    private String type;
     private int xPos, yPos;
     private boolean movable;
 
@@ -14,7 +11,6 @@ abstract public class BoardItem {
     }
 
     public BoardItem(int xPos, int yPos) {
-        this.type = type;
         this.xPos = xPos;
         this.yPos = yPos;
         this.movable = false;

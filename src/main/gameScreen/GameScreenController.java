@@ -2,26 +2,30 @@ package main.gameScreen;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.stage.Stage;
+import main.gameOver.EndGameController;
 import main.model.Board;
 import main.model.BoardSpace;
 import main.model.boardItems.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class GameScreenController implements Initializable {
@@ -33,6 +37,9 @@ public class GameScreenController implements Initializable {
 
     @FXML
     private GridPane board;
+
+    @FXML
+    private AnchorPane ap;
 
     private Board gameBoard;
 
@@ -81,6 +88,13 @@ public class GameScreenController implements Initializable {
             }
         }
         board.setGridLinesVisible(true);
+
+        if(gameBoard.getMiner().didFallOnPit()) {
+            // show game over screen
+            endGame("Game Over. Miner Failed...");
+        } else if(gameBoard.getMiner().didReachGoldPot()) {
+            endGame("Miner has reached the Gold Pot!");
+        }
     }
 
     /**
@@ -112,9 +126,24 @@ public class GameScreenController implements Initializable {
         }
     }
 
-    @FXML
-    public void skipMove(ActionEvent ae) {
+    public void randomMove() {
+        Random randomizer = new Random();
+        switch(randomizer.nextInt(3) + 1) {
+            case 1:
+                front();
+                break;
+            case 2:
+                scan();
+                break;
+            case 3:
+                rotate();
+                break;
+        }
+    }
 
+    @FXML
+    public void nextMove(ActionEvent ae) {
+        randomMove();
     }
 
     @FXML
@@ -132,5 +161,18 @@ public class GameScreenController implements Initializable {
     public void front() {
         gameBoard.getMiner().front();
         refresh();
+    }
+
+    public void endGame(String text) {
+        try {
+            FXMLLoader endGameLoader = new FXMLLoader(getClass().getResource("/main/gameOver/EndGame.fxml"));
+            EndGameController endGameController = new EndGameController(text, gameBoard.getStatistics());
+            endGameLoader.setController(endGameController);
+
+            Stage stage = (Stage) ap.getScene().getWindow();
+            stage.setScene(new Scene(endGameLoader.load()));
+        } catch(Exception e) {
+            System.out.println(e);
+        }
     }
 }
