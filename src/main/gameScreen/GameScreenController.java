@@ -148,7 +148,11 @@ public class GameScreenController implements Initializable {
 
     @FXML
     public void scan() {
-        System.out.println(gameBoard.getMiner().scan());
+        BoardItem scanned = gameBoard.getMiner().scan();
+        if(scanned instanceof Pit) System.out.println("Pit Ahead!");
+        else if(scanned instanceof Beacon) System.out.println("Beacon Ahead! (" + ((Beacon) scanned).getStepsToGoldPot() + " steps away from the gold pot)");
+        else if(scanned instanceof GoldPot) System.out.println("Gold Pot Ahead!");
+        else System.out.println("Scanned nothing...");
     }
 
     @FXML

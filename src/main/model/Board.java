@@ -9,6 +9,7 @@ import java.util.Random;
 public class Board {
     private ArrayList<ArrayList<BoardSpace>> board;
     private Miner miner;
+    private GoldPot goldPot;
     private Statistics statistics;
 
     public Board(int n) {
@@ -34,8 +35,8 @@ public class Board {
             this.board.add(new ArrayList<>());
             for(int c = 0; c < n; c++) {
                 if(r == 0 && c == 0) this.board.get(r).add(new BoardSpace(this.miner, c, r));
-                else if (inList(r * 10 + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(new GoldPot(c, r), c, r));
-                else if(inList(r * 10 + c, itemPositions.get(1))) this.board.get(r).add(new BoardSpace(new Beacon(c, r), c, r));
+                else if (inList(r * 10 + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(this.goldPot, c, r));
+                else if(inList(r * 10 + c, itemPositions.get(1))) this.board.get(r).add(new BoardSpace(new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos()), c, r));
                 else if(inList(r * 10 + c, itemPositions.get(2))) this.board.get(r).add(new BoardSpace(new Pit(c, r), c, r));
                 else this.board.get(r).add(new BoardSpace(c, r));
             }
@@ -62,6 +63,7 @@ public class Board {
         ArrayList<Integer> goldPotPosition = new ArrayList<Integer>();
         goldPotPosition.add(generateUniqueRandomPosition(upperBound, positionsTaken));
         positionsTaken.add(goldPotPosition.get(0)); // to track taken positions;
+        this.goldPot = new GoldPot(goldPotPosition.get(0) % 10, goldPotPosition.get(0) / 10);
 
         // random position for beacon
         ArrayList<Integer> beaconPositions = new ArrayList<Integer>();

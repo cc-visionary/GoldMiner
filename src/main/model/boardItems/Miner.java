@@ -77,9 +77,8 @@ final public class Miner extends BoardItem {
      * Scans the direction where the Miner is facing
      * @return integer determining what has been found
      */
-    public int scan() {
-        int result = -1;
-        System.out.println(direction);
+    public BoardItem scan() {
+        BoardItem result = null;
         switch(this.direction) {
             case 'u':
                 result = scanUp(getYPos(), getXPos());
@@ -105,17 +104,13 @@ final public class Miner extends BoardItem {
      * @param column y location of the miner
      * @return       nearest item on the left of the miner
      */
-    private int scanLeft(int row, int column) {
+    private BoardItem scanLeft(int row, int column) {
         // checks the all spaces in the left of the miner until an item is found
         for(int c = column - 1; c >= 0; c--) {
-            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) {
-                if(boardItem instanceof Beacon) return 1;
-                else if(boardItem instanceof Pit) return 2;
-                else if(boardItem instanceof GoldPot) return 3;
-            }
+            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) return boardItem;
         }
 
-        return -1;
+        return null;
     }
 
     /**
@@ -124,17 +119,13 @@ final public class Miner extends BoardItem {
      * @param column y location of the miner
      * @return       nearest item on the right of the miner
      */
-    private int scanRight(int row, int column) {
+    private BoardItem scanRight(int row, int column) {
         // checks the all spaces in the right of the miner until an item is found
         for(int c = column + 1; c < board.getBoard().get(row).size(); c++) {
-            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) {
-                if(boardItem instanceof Beacon) return 1;
-                else if(boardItem instanceof Pit) return 2;
-                else if(boardItem instanceof GoldPot) return 3;
-            }
+            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) return boardItem;
         }
 
-        return -1;
+        return null;
     }
 
     /**
@@ -143,17 +134,13 @@ final public class Miner extends BoardItem {
      * @param column y location of the miner
      * @return       nearest item above the miner
      */
-    private int scanUp(int row, int column) {
+    private BoardItem scanUp(int row, int column) {
         // checks the all spaces in the above the miner until an item is found
         for(int r = row - 1; r >= 0; r--) {
-            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) {
-                if(boardItem instanceof Beacon) return 1;
-                else if(boardItem instanceof Pit) return 2;
-                else if(boardItem instanceof GoldPot) return 3;
-            }
+            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) return boardItem;
         }
 
-        return -1;
+        return null;
     }
 
     /**
@@ -162,17 +149,13 @@ final public class Miner extends BoardItem {
      * @param column y location of the miner
      * @return       nearest item below the miner
      */
-    private int scanDown(int row, int column) {
+    private BoardItem scanDown(int row, int column) {
         // checks the all spaces in the below the miner until an item is found
         for(int r = row + 1; r < board.getBoard().get(0).size(); r++) {
-            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) {
-                if(boardItem instanceof Beacon) return 1;
-                else if(boardItem instanceof Pit) return 2;
-                else if(boardItem instanceof GoldPot) return 3;
-            }
+            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) return boardItem;
         }
 
-        return -1;
+        return null;
     }
 
     /**
