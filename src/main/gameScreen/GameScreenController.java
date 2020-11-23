@@ -17,15 +17,13 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
-import main.gameOver.EndGameController;
+import main.endGame.EndGameController;
 import main.model.Board;
 import main.model.BoardSpace;
 import main.model.boardItems.*;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 public class GameScreenController implements Initializable {
@@ -41,9 +39,11 @@ public class GameScreenController implements Initializable {
     @FXML
     private AnchorPane ap;
 
+    private char choice;
     private Board gameBoard;
 
     public GameScreenController(int n, char choice) {
+        this.choice = choice;
         gameBoard = new Board(n);
     }
 
@@ -126,24 +126,17 @@ public class GameScreenController implements Initializable {
         }
     }
 
-    public void randomMove() {
-        Random randomizer = new Random();
-        switch(randomizer.nextInt(3) + 1) {
-            case 1:
-                front();
-                break;
-            case 2:
-                scan();
-                break;
-            case 3:
-                rotate();
-                break;
-        }
-    }
-
     @FXML
     public void nextMove(ActionEvent ae) {
-        randomMove();
+        switch (choice) {
+            case 'R':
+                gameBoard.getMiner().randomMove();
+                break;
+            case 'S':
+                gameBoard.getMiner().smartMove();
+                break;
+        }
+        refresh();
     }
 
     @FXML
@@ -169,7 +162,7 @@ public class GameScreenController implements Initializable {
 
     public void endGame(String text) {
         try {
-            FXMLLoader endGameLoader = new FXMLLoader(getClass().getResource("/main/gameOver/EndGame.fxml"));
+            FXMLLoader endGameLoader = new FXMLLoader(getClass().getResource("/main/endGame/EndGame.fxml"));
             EndGameController endGameController = new EndGameController(text, gameBoard.getStatistics());
             endGameLoader.setController(endGameController);
 

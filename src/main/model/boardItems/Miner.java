@@ -4,6 +4,7 @@ import main.model.Board;
 import main.model.BoardSpace;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 final public class Miner extends BoardItem {
     private char direction;
@@ -180,6 +181,31 @@ final public class Miner extends BoardItem {
         }
 
         return false;
+    }
+
+    /**
+     * Lets the Miner do a Random Move
+     */
+    public void randomMove() {
+        Random randomizer = new Random();
+        switch(randomizer.nextInt(3) + 1) {
+            case 1:
+                front();
+                break;
+            case 2:
+                scan();
+                break;
+            case 3:
+                rotate();
+                break;
+        }
+    }
+
+    /**
+     * Lets the Miner do a Smart Move
+     */
+    public void smartMove() {
+
     }
 
     public char getDirection() {

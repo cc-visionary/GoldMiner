@@ -1,4 +1,4 @@
-package main.gameOver;
+package main.endGame;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -36,12 +36,12 @@ public class EndGameController implements Initializable {
     }
 
     @FXML
-    public void exit() {
+    public void onExit() {
         Platform.exit();
     }
 
     @FXML
-    public void returnToMenu(ActionEvent ae) {
+    public void onContinue(ActionEvent ae) {
         try {
             FXMLLoader menuLoader = new FXMLLoader(getClass().getResource("/main/menu/Menu.fxml"));
             // set menu loader's controller to MenuController
