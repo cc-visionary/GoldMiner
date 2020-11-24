@@ -35,10 +35,57 @@ public class Board {
             this.board.add(new ArrayList<>());
             for(int c = 0; c < n; c++) {
                 if(r == 0 && c == 0) this.board.get(r).add(new BoardSpace(this.miner, c, r));
-                else if (inList(r * 10 + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(this.goldPot, c, r));
-                else if(inList(r * 10 + c, itemPositions.get(1))) this.board.get(r).add(new BoardSpace(new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos()), c, r));
-                else if(inList(r * 10 + c, itemPositions.get(2))) this.board.get(r).add(new BoardSpace(new Pit(c, r), c, r));
+                else if (inList(r * n + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(this.goldPot, c, r));
+                else if(inList(r * n + c, itemPositions.get(1))) this.board.get(r).add(new BoardSpace(new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos()), c, r));
+                else if(inList(r * n + c, itemPositions.get(2))) this.board.get(r).add(new BoardSpace(new Pit(c, r), c, r));
                 else this.board.get(r).add(new BoardSpace(c, r));
+            }
+        }
+
+        verifyBeacons();
+    }
+
+    /**
+     * Checks if there are beacons who has a Pit in between of it and the Gold Pot
+     * If there is, set its Steps to Gold Pot value to -1
+     */
+    private void verifyBeacons() {
+        // loop the board
+        for(int i = 0; i < board.size(); i++) {
+            for(int j = 0; j < board.get(i).size(); j++) {
+                // for each board space, loop its board items
+                for(BoardItem boardItem : board.get(i).get(j).getBoardItems()) {
+                    // check if thatboard item is a beacon
+                    if(boardItem instanceof Beacon) {
+                        // if it is, then check if it has the same horizontal or vertical position with the Gold ot
+                        Beacon beacon = (Beacon) boardItem;
+                        if(beacon.getXPos() == this.goldPot.getXPos()) {
+                            // if it is, check if there's a Pit in between
+                            int smaller = Math.min(beacon.getYPos(), this.goldPot.getYPos()), bigger = Math.max(beacon.getYPos(), this.goldPot.getYPos());
+                            for(int y = smaller + 1; y < bigger && beacon.getStepsToGoldPot() != -1; y++) {
+                                for(BoardItem checkBoardItem : board.get(y).get(beacon.getXPos()).getBoardItems()) {
+                                    if(checkBoardItem instanceof Pit) {
+                                        // if there is, set the steps to gold pot value to -1
+                                        beacon.setStepsToGoldPot(-1);
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if(beacon.getYPos() == this.goldPot.getYPos()) {
+                            // if it is, check if there's a Pit in between
+                            int smaller = Math.min(beacon.getXPos(), this.goldPot.getXPos()), bigger = Math.max(beacon.getXPos(), this.goldPot.getXPos());
+                            for(int x = smaller + 1; x < bigger && beacon.getStepsToGoldPot() != -1; x++) {
+                                for(BoardItem checkBoardItem : board.get(beacon.getYPos()).get(x).getBoardItems()) {
+                                    if(checkBoardItem instanceof Pit) {
+                                        // if there is, set the steps to gold pot value to -1
+                                        beacon.setStepsToGoldPot(-1);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -52,7 +99,7 @@ public class Board {
      *           - index 2 contains pit positions
      */
     private ArrayList<ArrayList<Integer>> generateRandomPositions(int upperBound) {
-        final int NBEACON = 5, NPIT = 5;
+        final int NBEACON = 5, NPIT = 5, N = (int) Math.sqrt(upperBound);
 
         // assert NBEACON + NPIT + 2 >= upperBound (to make sure there is space for every item on the board)
 
@@ -63,7 +110,8 @@ public class Board {
         ArrayList<Integer> goldPotPosition = new ArrayList<Integer>();
         goldPotPosition.add(generateUniqueRandomPosition(upperBound, positionsTaken));
         positionsTaken.add(goldPotPosition.get(0)); // to track taken positions;
-        this.goldPot = new GoldPot(goldPotPosition.get(0) % 10, goldPotPosition.get(0) / 10);
+        this.goldPot = new GoldPot(goldPotPosition.get(0) % N, goldPotPosition.get(0) / N);
+        System.out.println(goldPotPosition.get(0) + " " + this.goldPot.getXPos() + " " + this.goldPot.getYPos());
 
         // random position for beacon
         ArrayList<Integer> beaconPositions = new ArrayList<Integer>();
