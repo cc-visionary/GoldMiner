@@ -34,17 +34,17 @@ public class GameScreenController implements Initializable {
     private CheckBox autoskipCheckbox;
 
     @FXML
-    private GridPane board;
+    private GridPane grid;
 
     @FXML
     private AnchorPane ap;
 
     private char choice;
-    private Board gameBoard;
+    private Board board;
 
-    public GameScreenController(int n, char choice) {
+    public GameScreenController(Board board, char choice) {
         this.choice = choice;
-        gameBoard = new Board(n);
+        this.board = board;
     }
 
     @Override
@@ -56,10 +56,10 @@ public class GameScreenController implements Initializable {
      * Refreshes the Board and reassigns the values from the Game Board
      */
     public void refresh() {
-        Node node = board.getChildren().get(0); // to maintain grid line
-        board.getChildren().clear();            // removes all entities
-        board.getChildren().add(0,node);  // restore the grid line
-        for(ArrayList<BoardSpace> row : gameBoard.getBoard()) {
+        Node node = grid.getChildren().get(0); // to maintain grid line
+        grid.getChildren().clear();            // removes all entities
+        grid.getChildren().add(0,node);  // restore the grid line
+        for(ArrayList<BoardSpace> row : board.getBoard()) {
             for (BoardSpace column : row) {
                 for (BoardItem boardItem : column.getBoardItems()) {
                     ImageView imageView = new ImageView();
@@ -67,8 +67,7 @@ public class GameScreenController implements Initializable {
                     imageView.setFitWidth(45);
                     if (boardItem instanceof Beacon) imageView.setImage(new Image("/images/sprites/beacon.png"));
                     else if (boardItem instanceof Pit) imageView.setImage(new Image("/images/sprites/pit hole.png"));
-                    else if (boardItem instanceof GoldPot)
-                        imageView.setImage(new Image("/images/sprites/gold pot.png"));
+                    else if (boardItem instanceof GoldPot) imageView.setImage(new Image("/images/sprites/gold pot.png"));
                     else if (boardItem instanceof Miner) {
                         imageView.setImage(new Image("/images/sprites/miner.png"));
                         switch (((Miner) boardItem).getDirection()) {
@@ -83,16 +82,16 @@ public class GameScreenController implements Initializable {
                                 break;
                         }
                     }
-                    board.add(imageView, column.getRow(), column.getColumn());
+                    grid.add(imageView, column.getRow(), column.getColumn());
                 }
             }
         }
-        board.setGridLinesVisible(true);
+        grid.setGridLinesVisible(true);
 
-        if(gameBoard.getMiner().didFallOnPit()) {
+        if(board.getMiner().didFallOnPit()) {
             // show game over screen
             endGame("Game Over. Miner Failed...");
-        } else if(gameBoard.getMiner().didReachGoldPot()) {
+        } else if(board.getMiner().didReachGoldPot()) {
             endGame("Miner has reached the Gold Pot!");
         }
     }
@@ -102,13 +101,13 @@ public class GameScreenController implements Initializable {
      * through looping the 2-dimensional ArrayList of the Board
      */
     public void generateBoard() {
-        for(ArrayList<BoardSpace> row : gameBoard.getBoard()) {
+        for(ArrayList<BoardSpace> row : board.getBoard()) {
             RowConstraints rowConstraints = new RowConstraints(50);
             ColumnConstraints columnConstraints = new ColumnConstraints(50);
             rowConstraints.setValignment(VPos.CENTER);
             columnConstraints.setHalignment(HPos.CENTER);
-            board.getRowConstraints().add(rowConstraints);
-            board.getColumnConstraints().add(columnConstraints);
+            grid.getRowConstraints().add(rowConstraints);
+            grid.getColumnConstraints().add(columnConstraints);
             for(BoardSpace column : row) {
                 for(BoardItem boardItem : column.getBoardItems()) {
                     ImageView imageView = new ImageView();
@@ -120,7 +119,7 @@ public class GameScreenController implements Initializable {
                     else if (boardItem instanceof GoldPot) imageView.setImage(new Image("/images/sprites/gold pot.png"));
                     else if (boardItem instanceof Miner) imageView.setImage(new Image("/images/sprites/miner.png"));
 
-                    board.add(imageView, column.getRow(), column.getColumn());
+                    grid.add(imageView, column.getRow(), column.getColumn());
                 }
             }
         }
@@ -130,10 +129,10 @@ public class GameScreenController implements Initializable {
     public void nextMove(ActionEvent ae) {
         switch (choice) {
             case 'R':
-                gameBoard.getMiner().randomMove();
+                board.getMiner().randomMove();
                 break;
             case 'S':
-                gameBoard.getMiner().smartMove();
+                board.getMiner().smartMove();
                 break;
         }
         refresh();
@@ -141,7 +140,7 @@ public class GameScreenController implements Initializable {
 
     @FXML
     public void scan() {
-        BoardItem scanned = gameBoard.getMiner().scan();
+        BoardItem scanned = board.getMiner().scan();
         if(scanned instanceof Pit) System.out.println("Pit Ahead!");
         else if(scanned instanceof Beacon) System.out.println("Beacon Ahead! (" + ((Beacon) scanned).getStepsToGoldPot() + " steps away from the gold pot)");
         else if(scanned instanceof GoldPot) System.out.println("Gold Pot Ahead!");
@@ -150,20 +149,20 @@ public class GameScreenController implements Initializable {
 
     @FXML
     public void rotate() {
-        gameBoard.getMiner().rotate();
+        board.getMiner().rotate();
         refresh();
     }
 
     @FXML
     public void front() {
-        gameBoard.getMiner().front();
+        board.getMiner().front();
         refresh();
     }
 
     public void endGame(String text) {
         try {
             FXMLLoader endGameLoader = new FXMLLoader(getClass().getResource("/main/endGame/EndGame.fxml"));
-            EndGameController endGameController = new EndGameController(text, gameBoard.getStatistics());
+            EndGameController endGameController = new EndGameController(text, board.getStatistics());
             endGameLoader.setController(endGameController);
 
             Stage stage = (Stage) ap.getScene().getWindow();

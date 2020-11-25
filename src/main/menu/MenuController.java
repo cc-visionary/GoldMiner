@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Spinner;
 import javafx.stage.Stage;
+import main.editBoard.EditBoardController;
 import main.gameScreen.GameScreenController;
 import main.model.Board;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
 
 public class MenuController {
     @FXML
-    private Spinner spinner;
+    private Spinner beaconSpinner, pitSpinner, sizeSpinner;
 
     @FXML
     public void chooseRandom(ActionEvent ae) throws IOException {
@@ -29,17 +30,17 @@ public class MenuController {
 
     private void goToGameScreen(ActionEvent ae, char choice) throws IOException {
         Stage primaryStage = (Stage) ((Node) ae.getSource()).getScene().getWindow();
-        Parent root = generateGameScreenLoader(choice).load();
+        Parent root = generateEditBoard(choice).load();
 
         Scene scene = new Scene(root);
 
         primaryStage.setScene(scene);
     }
 
-    private FXMLLoader generateGameScreenLoader(char choice) {
-        FXMLLoader gameScreenLoader = new FXMLLoader(getClass().getResource("/main/gameScreen/GameScreen.fxml"));
-        gameScreenLoader.setController(new GameScreenController((int) spinner.getValue(), choice));
+    private FXMLLoader generateEditBoard(char choice) {
+        FXMLLoader editBoardLoader = new FXMLLoader(getClass().getResource("/main/editBoard/EditBoard.fxml"));
+        editBoardLoader.setController(new EditBoardController((int) beaconSpinner.getValue(), (int) pitSpinner.getValue(), (int) sizeSpinner.getValue(), choice));
 
-        return gameScreenLoader;
+        return editBoardLoader;
     }
 }

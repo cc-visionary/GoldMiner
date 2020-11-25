@@ -28,19 +28,19 @@ final public class Miner extends BoardItem {
         ArrayList<ArrayList<BoardSpace>> aBoard = board.getBoard();
         switch(this.direction) {
             case 'r':
-                if(getXPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos() + 1, getYPos());
+                if(getXPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos() + 1, getYPos(), false);
                 else System.out.println("Can't move the miner 1 step right");
                 break;
             case 'l':
-                if(getXPos() - 1 >= 0) board.moveBoardItem(this, getXPos() - 1, getYPos());
+                if(getXPos() - 1 >= 0) board.moveBoardItem(this, getXPos() - 1, getYPos(), false);
                 else System.out.println("Can't move the miner 1 step left");
                 break;
             case 'u':
-                if(getYPos() - 1 >= 0) board.moveBoardItem(this, getXPos(), getYPos() - 1);
+                if(getYPos() - 1 >= 0) board.moveBoardItem(this, getXPos(), getYPos() - 1, false);
                 else System.out.println("Can't move the miner 1 step up");
                 break;
             case 'd':
-                if(getYPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos(), getYPos() + 1);
+                if(getYPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos(), getYPos() + 1, false);
                 else System.out.println("Can't move the miner 1 step down");
                 break;
         }

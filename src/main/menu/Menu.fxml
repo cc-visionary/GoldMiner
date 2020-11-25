@@ -17,6 +17,38 @@
       </Label>
       <VBox spacing="10.0">
          <children>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0">
+               <children>
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <children>
+                        <Label text="Beacons:">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Spinner fx:id="beaconSpinner" editable="true" prefWidth="75.0">
+                           <valueFactory>
+                              <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="5" max="30" min="1" />
+                           </valueFactory>
+                        </Spinner>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0">
+                     <children>
+                        <Label text="Pits:">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Spinner fx:id="pitSpinner" editable="true" prefWidth="75.0">
+                           <valueFactory>
+                              <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="5" max="30" min="1" />
+                           </valueFactory>
+                        </Spinner>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
             <HBox alignment="CENTER" spacing="10.0">
                <children>
                   <Label text="Grid Size:">
@@ -24,9 +56,9 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <Spinner fx:id="spinner" editable="true">
+                  <Spinner fx:id="sizeSpinner" editable="true" prefWidth="200.0">
                      <valueFactory>
-                        <SpinnerValueFactory.IntegerSpinnerValueFactory max="68" min="8" />
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="10" max="68" min="8" />
                      </valueFactory>
                   </Spinner>
                </children>

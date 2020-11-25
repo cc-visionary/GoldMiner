@@ -10,12 +10,19 @@ public class Board {
     private ArrayList<ArrayList<BoardSpace>> board;
     private Miner miner;
     private GoldPot goldPot;
+    private ArrayList<Beacon> beacons;
+    private ArrayList<Pit> pits;
     private Statistics statistics;
+    private int nBeacons, nPits;
 
-    public Board(int n) {
+    public Board(int nBeacons, int nPits, int n) {
         this.statistics = new Statistics();
         this.miner = new Miner(this);
         this.board = new ArrayList<>();
+        this.nBeacons = nBeacons;
+        this.nPits = nPits;
+        this.beacons = new ArrayList<Beacon>();
+        this.pits = new ArrayList<Pit>();
 
         generateBoard(n);
     }
@@ -36,8 +43,15 @@ public class Board {
             for(int c = 0; c < n; c++) {
                 if(r == 0 && c == 0) this.board.get(r).add(new BoardSpace(this.miner, c, r));
                 else if (inList(r * n + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(this.goldPot, c, r));
-                else if(inList(r * n + c, itemPositions.get(1))) this.board.get(r).add(new BoardSpace(new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos()), c, r));
-                else if(inList(r * n + c, itemPositions.get(2))) this.board.get(r).add(new BoardSpace(new Pit(c, r), c, r));
+                else if(inList(r * n + c, itemPositions.get(1))) {
+                    Beacon beacon = new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos());
+                    this.board.get(r).add(new BoardSpace(beacon, c, r));
+                    this.beacons.add(beacon);
+                } else if(inList(r * n + c, itemPositions.get(2))) {
+                    Pit pit = new Pit(c, r);
+                    this.board.get(r).add(new BoardSpace(pit, c, r));
+                    this.pits.add(pit);
+                }
                 else this.board.get(r).add(new BoardSpace(c, r));
             }
         }
@@ -55,13 +69,14 @@ public class Board {
             for(int j = 0; j < board.get(i).size(); j++) {
                 // for each board space, loop its board items
                 for(BoardItem boardItem : board.get(i).get(j).getBoardItems()) {
-                    // check if thatboard item is a beacon
+                    // check if that board item is a beacon
                     if(boardItem instanceof Beacon) {
-                        // if it is, then check if it has the same horizontal or vertical position with the Gold ot
+                        // if it is, then check if it has the same horizontal or vertical position with the Gold Pot
                         Beacon beacon = (Beacon) boardItem;
                         if(beacon.getXPos() == this.goldPot.getXPos()) {
                             // if it is, check if there's a Pit in between
                             int smaller = Math.min(beacon.getYPos(), this.goldPot.getYPos()), bigger = Math.max(beacon.getYPos(), this.goldPot.getYPos());
+                            // loop the spaces in between the Beacon and the Gold Pot
                             for(int y = smaller + 1; y < bigger && beacon.getStepsToGoldPot() != -1; y++) {
                                 for(BoardItem checkBoardItem : board.get(y).get(beacon.getXPos()).getBoardItems()) {
                                     if(checkBoardItem instanceof Pit) {
@@ -74,6 +89,7 @@ public class Board {
                         } else if(beacon.getYPos() == this.goldPot.getYPos()) {
                             // if it is, check if there's a Pit in between
                             int smaller = Math.min(beacon.getXPos(), this.goldPot.getXPos()), bigger = Math.max(beacon.getXPos(), this.goldPot.getXPos());
+                            // loop the spaces in between the Beacon and the Gold Pot
                             for(int x = smaller + 1; x < bigger && beacon.getStepsToGoldPot() != -1; x++) {
                                 for(BoardItem checkBoardItem : board.get(beacon.getYPos()).get(x).getBoardItems()) {
                                     if(checkBoardItem instanceof Pit) {
@@ -99,9 +115,9 @@ public class Board {
      *           - index 2 contains pit positions
      */
     private ArrayList<ArrayList<Integer>> generateRandomPositions(int upperBound) {
-        final int NBEACON = 5, NPIT = 5, N = (int) Math.sqrt(upperBound);
+        final int N = (int) Math.sqrt(upperBound);
 
-        // assert NBEACON + NPIT + 2 >= upperBound (to make sure there is space for every item on the board)
+        // assert nBeacons + nPits + 2 >= upperBound (to make sure there is space for every item on the board)
 
         ArrayList<ArrayList<Integer>> storage = new ArrayList<ArrayList<Integer>>();
         ArrayList<Integer> positionsTaken = new ArrayList<>();
@@ -115,7 +131,7 @@ public class Board {
 
         // random position for beacon
         ArrayList<Integer> beaconPositions = new ArrayList<Integer>();
-        for(int i = 0; i < NBEACON; i++) {
+        for(int i = 0; i < nBeacons; i++) {
             int position = generateUniqueRandomPosition(upperBound, positionsTaken);
             beaconPositions.add(position);
             positionsTaken.add(position);
@@ -123,7 +139,7 @@ public class Board {
 
         // random position for pits
         ArrayList<Integer> pitPositions = new ArrayList<Integer>();
-        for(int i = 0; i < NPIT; i++) {
+        for(int i = 0; i < nPits; i++) {
             int position = generateUniqueRandomPosition(upperBound, positionsTaken);
             pitPositions.add(position);
             positionsTaken.add(position);
@@ -168,8 +184,8 @@ public class Board {
      * @param xPos      column of item to land
      * @param yPos      row of item to land
      */
-    public void moveBoardItem(BoardItem boardItem, int xPos, int yPos) {
-        if(boardItem.isMovable()) {
+    public void moveBoardItem(BoardItem boardItem, int xPos, int yPos, boolean override) {
+        if(boardItem.isMovable() || override) {
             board.get(boardItem.getYPos()).get(boardItem.getXPos()).removeBoardItem(boardItem);
             board.get(yPos).get(xPos).addBoardItem(boardItem);
             boardItem.setXPos(xPos);
@@ -179,6 +195,18 @@ public class Board {
 
     public Miner getMiner() {
         return miner;
+    }
+
+    public ArrayList<Beacon> getBeacons() {
+        return beacons;
+    }
+
+    public ArrayList<Pit> getPits() {
+        return pits;
+    }
+
+    public GoldPot getGoldPot() {
+        return goldPot;
     }
 
     public Statistics getStatistics() {
