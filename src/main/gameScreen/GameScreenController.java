@@ -45,6 +45,7 @@ public class GameScreenController implements Initializable {
     public GameScreenController(Board board, char choice) {
         this.choice = choice;
         this.board = board;
+        this.board.verifyBeacons();
     }
 
     @Override

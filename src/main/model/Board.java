@@ -55,15 +55,13 @@ public class Board {
                 else this.board.get(r).add(new BoardSpace(c, r));
             }
         }
-
-        verifyBeacons();
     }
 
     /**
      * Checks if there are beacons who has a Pit in between of it and the Gold Pot
      * If there is, set its Steps to Gold Pot value to -1
      */
-    private void verifyBeacons() {
+    public void verifyBeacons() {
         // loop the board
         for(int i = 0; i < board.size(); i++) {
             for(int j = 0; j < board.get(i).size(); j++) {
@@ -75,30 +73,30 @@ public class Board {
                         Beacon beacon = (Beacon) boardItem;
                         if(beacon.getXPos() == this.goldPot.getXPos()) {
                             // if it is, check if there's a Pit in between
+                            boolean hasPitInBetween = false;
                             int smaller = Math.min(beacon.getYPos(), this.goldPot.getYPos()), bigger = Math.max(beacon.getYPos(), this.goldPot.getYPos());
                             // loop the spaces in between the Beacon and the Gold Pot
-                            for(int y = smaller + 1; y < bigger && beacon.getStepsToGoldPot() != -1; y++) {
+                            for(int y = smaller + 1; y < bigger && !hasPitInBetween; y++) {
                                 for(BoardItem checkBoardItem : board.get(y).get(beacon.getXPos()).getBoardItems()) {
-                                    if(checkBoardItem instanceof Pit) {
-                                        // if there is, set the steps to gold pot value to -1
-                                        beacon.setStepsToGoldPot(-1);
-                                        break;
-                                    }
+                                    // if there is, set the steps to gold pot value to -1
+                                    if(checkBoardItem instanceof Pit) hasPitInBetween = true;
                                 }
                             }
+                            if(hasPitInBetween) ((Beacon) boardItem).setStepsToGoldPot(-1);
+                            else ((Beacon) boardItem).setStepsToGoldPot(Math.abs(beacon.getYPos() - this.goldPot.getYPos()) - 1);
                         } else if(beacon.getYPos() == this.goldPot.getYPos()) {
                             // if it is, check if there's a Pit in between
+                            boolean hasPitInBetween = false;
                             int smaller = Math.min(beacon.getXPos(), this.goldPot.getXPos()), bigger = Math.max(beacon.getXPos(), this.goldPot.getXPos());
                             // loop the spaces in between the Beacon and the Gold Pot
                             for(int x = smaller + 1; x < bigger && beacon.getStepsToGoldPot() != -1; x++) {
                                 for(BoardItem checkBoardItem : board.get(beacon.getYPos()).get(x).getBoardItems()) {
-                                    if(checkBoardItem instanceof Pit) {
-                                        // if there is, set the steps to gold pot value to -1
-                                        beacon.setStepsToGoldPot(-1);
-                                        break;
-                                    }
+                                    // if there is, set the steps to gold pot value to -1
+                                    if(checkBoardItem instanceof Pit) hasPitInBetween = true;
                                 }
                             }
+                            if(hasPitInBetween) ((Beacon) boardItem).setStepsToGoldPot(-1);
+                            else ((Beacon) boardItem).setStepsToGoldPot(Math.abs(beacon.getXPos() - this.goldPot.getXPos()) - 1);
                         }
                     }
                 }
