@@ -16,7 +16,7 @@
             <Button fx:id="rotateButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#rotate" text="Rotate" />
             <Button fx:id="frontButton" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#front" text="Front" />
             <Button fx:id="nextButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#nextMove" text="Next" />
-            <CheckBox fx:id="autoskipCheckbox" mnemonicParsing="false" text="Auto-Next" />
+            <CheckBox fx:id="autoSkipCheckbox" mnemonicParsing="false" onAction="#autoSkip" text="Auto-Next" />
          </children>
       </VBox>
    </children>

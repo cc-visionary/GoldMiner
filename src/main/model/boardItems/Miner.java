@@ -1,5 +1,6 @@
 package main.model.boardItems;
 
+import main.model.Agent;
 import main.model.Board;
 import main.model.BoardSpace;
 
@@ -188,14 +189,11 @@ final public class Miner extends BoardItem {
      */
     public void randomMove() {
         Random randomizer = new Random();
-        switch(randomizer.nextInt(3) + 1) {
+        switch(randomizer.nextInt(2) + 1) {
             case 1:
                 front();
                 break;
             case 2:
-                scan();
-                break;
-            case 3:
                 rotate();
                 break;
         }
@@ -205,7 +203,19 @@ final public class Miner extends BoardItem {
      * Lets the Miner do a Smart Move
      */
     public void smartMove() {
+        if(Agent.getScannedItem() == null) {
+            BoardItem boardItem = scan();
+            if(boardItem != null) Agent.setScannedItem(boardItem);
+        } else {
+            if(Agent.getScannedItem() instanceof GoldPot) {
+                front();
+            } else if(Agent.getScannedItem() instanceof Pit) {
+                rotate();
+                Agent.setScannedItem(null);
+            } else if(Agent.getScannedItem() instanceof Beacon) {
 
+            }
+        }
     }
 
     public char getDirection() {

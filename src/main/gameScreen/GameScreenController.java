@@ -1,5 +1,7 @@
 package main.gameScreen;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import main.endGame.EndGameController;
 import main.model.Board;
 import main.model.BoardSpace;
@@ -28,10 +31,10 @@ import java.util.ResourceBundle;
 
 public class GameScreenController implements Initializable {
     @FXML
-    private Button skipButton;
+    private Button scanButton, frontButton, rotateButton, nextButton;
 
     @FXML
-    private CheckBox autoskipCheckbox;
+    private CheckBox autoSkipCheckbox;
 
     @FXML
     private GridPane grid;
@@ -41,6 +44,7 @@ public class GameScreenController implements Initializable {
 
     private char choice;
     private Board board;
+    private Timeline timeline;
 
     public GameScreenController(Board board, char choice) {
         this.choice = choice;
@@ -127,7 +131,29 @@ public class GameScreenController implements Initializable {
     }
 
     @FXML
-    public void nextMove(ActionEvent ae) {
+    public void autoSkip() {
+        if(autoSkipCheckbox.isSelected()) {
+            scanButton.setDisable(true);
+            frontButton.setDisable(true);
+            rotateButton.setDisable(true);
+            nextButton.setDisable(true);
+            timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> nextMove()));
+            timeline.setCycleCount(Integer.MAX_VALUE);
+            timeline.play();
+        } else {
+            scanButton.setDisable(false);
+            frontButton.setDisable(false);
+            rotateButton.setDisable(false);
+            nextButton.setDisable(false);
+            if(timeline != null) {
+                timeline.stop();
+                timeline = null;
+            }
+        }
+    }
+
+    @FXML
+    public void nextMove() {
         switch (choice) {
             case 'R':
                 board.getMiner().randomMove();
