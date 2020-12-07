@@ -1,12 +1,8 @@
 package main.model.boardItems;
 
-import main.model.Board;
-import main.model.BoardSpace;
-
-import java.util.ArrayList;
-
 final public class Beacon extends BoardItem {
     private int stepsToGoldPot;
+    private boolean activated = false;
 
     public Beacon(int xPos, int yPos, int gxPos, int gyPos) {
         super(xPos, yPos);
@@ -16,11 +12,19 @@ final public class Beacon extends BoardItem {
         else stepsToGoldPot = -1;
     }
 
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
     public void setStepsToGoldPot(int stepsToGoldPot) {
         this.stepsToGoldPot = stepsToGoldPot;
     }
 
     public int getStepsToGoldPot() {
         return stepsToGoldPot;
+    }
+
+    public boolean isActivated() {
+        return activated;
     }
 }

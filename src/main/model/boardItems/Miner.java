@@ -24,28 +24,49 @@ final public class Miner extends BoardItem {
 
     /**
      * Moves te miner 1 step forward depending on its location
+     * @return boolean value determining whether front was successful or not
      */
     public void front() {
         ArrayList<ArrayList<BoardSpace>> aBoard = board.getBoard();
         switch(this.direction) {
             case 'r':
                 if(getXPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos() + 1, getYPos(), false);
-                else System.out.println("Can't move the miner 1 step right");
+                else System.out.println("Can't move 1 step right ward");
                 break;
             case 'l':
                 if(getXPos() - 1 >= 0) board.moveBoardItem(this, getXPos() - 1, getYPos(), false);
-                else System.out.println("Can't move the miner 1 step left");
+                else System.out.println("Can't move 1 step left ward");
                 break;
             case 'u':
                 if(getYPos() - 1 >= 0) board.moveBoardItem(this, getXPos(), getYPos() - 1, false);
-                else System.out.println("Can't move the miner 1 step up");
+                else System.out.println("Can't move 1 step upward");
                 break;
             case 'd':
                 if(getYPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos(), getYPos() + 1, false);
-                else System.out.println("Can't move the miner 1 step down");
+                else System.out.println("Can't move 1 step downward");
                 break;
         }
         board.getStatistics().addFront();
+    }
+
+    private boolean canFront() {
+        ArrayList<ArrayList<BoardSpace>> aBoard = board.getBoard();
+        boolean front = false;
+        switch(this.direction) {
+            case 'r':
+                if(getXPos() + 1 < aBoard.size()) front = true;
+                break;
+            case 'l':
+                if(getXPos() - 1 >= 0) front = true;
+                break;
+            case 'u':
+                if(getYPos() - 1 >= 0) front = true;
+                break;
+            case 'd':
+                if(getYPos() + 1 < aBoard.size()) front = true;
+                break;
+        }
+        return front;
     }
 
     /**
@@ -83,81 +104,41 @@ final public class Miner extends BoardItem {
         BoardItem result = null;
         switch(this.direction) {
             case 'u':
-                result = scanUp(getYPos(), getXPos());
+                if(getYPos() - 1 >= 0) {
+                    for(BoardItem boardItem : board.getBoard().get(getYPos() - 1).get(getXPos()).getBoardItems()) {
+                        result = boardItem;
+                        break;
+                    }
+                }
                 break;
             case 'd':
-                result = scanDown(getYPos(), getXPos());
+                if(getYPos() + 1 < board.getBoard().size() - 1)  {
+                    for(BoardItem boardItem : board.getBoard().get(getYPos() + 1).get(getXPos()).getBoardItems()) {
+                        result = boardItem;
+                        break;
+                    }
+                }
                 break;
             case 'l':
-                result = scanLeft(getYPos(), getXPos());
+                if(getXPos() - 1 >= 0) {
+                    for(BoardItem boardItem : board.getBoard().get(getYPos()).get(getXPos() - 1).getBoardItems()) {
+                        result = boardItem;
+                        break;
+                    }
+                }
                 break;
             case 'r':
-                result = scanRight(getYPos(), getXPos());
+                if(getXPos() + 1 < board.getBoard().size() - 1) {
+                    for(BoardItem boardItem : board.getBoard().get(getYPos()).get(getXPos() + 1).getBoardItems()) {
+                        result = boardItem;
+                        break;
+                    }
+                }
                 break;
         }
         board.getStatistics().addScan();
 
         return result;
-    }
-
-    /**
-     * Given a row and column, return the nearest item that it sees in its left
-     * @param row    x location of the miner
-     * @param column y location of the miner
-     * @return       nearest item on the left of the miner
-     */
-    private BoardItem scanLeft(int row, int column) {
-        // checks the all spaces in the left of the miner until an item is found
-        for(int c = column - 1; c >= 0; c--) {
-            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) return boardItem;
-        }
-
-        return null;
-    }
-
-    /**
-     * Given a row and column, return the nearest item that it sees in its right
-     * @param row    x location of the miner
-     * @param column y location of the miner
-     * @return       nearest item on the right of the miner
-     */
-    private BoardItem scanRight(int row, int column) {
-        // checks the all spaces in the right of the miner until an item is found
-        for(int c = column + 1; c < board.getBoard().get(row).size(); c++) {
-            for(BoardItem boardItem : board.getBoard().get(row).get(c).getBoardItems()) return boardItem;
-        }
-
-        return null;
-    }
-
-    /**
-     * Given a row and column, return the nearest item that it sees above it
-     * @param row    x location of the miner
-     * @param column y location of the miner
-     * @return       nearest item above the miner
-     */
-    private BoardItem scanUp(int row, int column) {
-        // checks the all spaces in the above the miner until an item is found
-        for(int r = row - 1; r >= 0; r--) {
-            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) return boardItem;
-        }
-
-        return null;
-    }
-
-    /**
-     * Given a row and column, return the nearest item that it sees below it
-     * @param row    x location of the miner
-     * @param column y location of the miner
-     * @return       nearest item below the miner
-     */
-    private BoardItem scanDown(int row, int column) {
-        // checks the all spaces in the below the miner until an item is found
-        for(int r = row + 1; r < board.getBoard().get(0).size(); r++) {
-            for(BoardItem boardItem : board.getBoard().get(r).get(column).getBoardItems()) return boardItem;
-        }
-
-        return null;
     }
 
     /**
@@ -205,16 +186,95 @@ final public class Miner extends BoardItem {
     public void smartMove() {
         if(Agent.getScannedItem() == null) {
             BoardItem boardItem = scan();
-            if(boardItem != null) Agent.setScannedItem(boardItem);
+            if(Agent.isFoundUsefulBeacon()) {
+                if(boardItem instanceof Pit || !canFront()) Agent.setIsBacktracking(true);
+                // optional: backtrack in specific number of steps (value returned by the beacon)
+                if(!canFront() && Agent.getFronts().size() == 0) {
+                    rotate();
+                    rotate();
+                } else if(Agent.isBacktracking()) backtrack();
+                else {
+                    front();
+                    Agent.addFront(direction);
+                }
+            } else if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) {
+                if(boardItem instanceof Beacon) {
+                    if(!((Beacon) boardItem).isActivated()) Agent.setScannedItem(boardItem);
+                    else doNormalRoutine();
+                } else Agent.setScannedItem(boardItem);
+            } else doNormalRoutine();
         } else {
-            if(Agent.getScannedItem() instanceof GoldPot) {
-                front();
-            } else if(Agent.getScannedItem() instanceof Pit) {
-                rotate();
+            if(Agent.getScannedItem() instanceof GoldPot) front();
+            else if(Agent.getScannedItem() instanceof Pit) {
+//                rotate();
                 Agent.setScannedItem(null);
             } else if(Agent.getScannedItem() instanceof Beacon) {
-
+                switch (direction) {
+                    case 'u':
+                    case 'd':
+                        if(Math.abs(Agent.getScannedItem().getYPos() - getYPos()) > 0) front();
+                        else {
+                            if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) Agent.setFoundUsefulBeacon(true);
+                            Agent.getFronts().clear();
+                            ((Beacon) Agent.getScannedItem()).setActivated(true);
+                            Agent.setScannedItem(null);
+                        }
+                        break;
+                    case 'l':
+                    case 'r':
+                        if(Math.abs(Agent.getScannedItem().getXPos() - getXPos()) > 0) front();
+                        else {
+                            if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) Agent.setFoundUsefulBeacon(true);
+                            Agent.getFronts().clear();
+                            ((Beacon) Agent.getScannedItem()).setActivated(true);
+                            Agent.setScannedItem(null);
+                        }
+                        break;
+                }
             }
+        }
+    }
+
+    private void doNormalRoutine() {
+        if(Agent.getCurrRotate() == 4) {
+            Agent.setCurrRotate(0);
+            if(!canFront()) rotate();
+            else front();
+        } else {
+            Agent.setCurrRotate(Agent.getCurrRotate() + 1);
+            rotate();
+        }
+    }
+
+    private void backtrack() {
+        if(Agent.getFronts().size() > 0) {
+            boolean canFront = false;
+            int lastIndex = Agent.getFronts().size() - 1;
+            switch(Agent.getFronts().get(lastIndex)) {
+                case 'u':
+                    if(direction != 'd') rotate();
+                    else canFront = true;
+                    break;
+                case 'd':
+                    if(direction != 'u') rotate();
+                    else canFront = true;
+                    break;
+                case 'l':
+                    if(direction != 'r') rotate();
+                    else canFront = true;
+                    break;
+                case 'r':
+                    if(direction != 'l') rotate();
+                    else canFront = true;
+                    break;
+            }
+            if(canFront) {
+                front();
+                Agent.getFronts().remove(lastIndex);
+            }
+        } else {
+            rotate();
+            Agent.setIsBacktracking(false);
         }
     }
 

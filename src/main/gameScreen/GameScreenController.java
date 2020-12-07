@@ -21,6 +21,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.endGame.EndGameController;
+import main.model.Agent;
 import main.model.Board;
 import main.model.BoardSpace;
 import main.model.boardItems.*;
@@ -137,7 +138,7 @@ public class GameScreenController implements Initializable {
             frontButton.setDisable(true);
             rotateButton.setDisable(true);
             nextButton.setDisable(true);
-            timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> nextMove()));
+            timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> nextMove()));
             timeline.setCycleCount(Integer.MAX_VALUE);
             timeline.play();
         } else {
@@ -187,6 +188,12 @@ public class GameScreenController implements Initializable {
     }
 
     public void endGame(String text) {
+        if(timeline != null) {
+            timeline.stop();
+            timeline = null;
+        }
+        Agent.resetValues();
+
         try {
             FXMLLoader endGameLoader = new FXMLLoader(getClass().getResource("/main/endGame/EndGame.fxml"));
             EndGameController endGameController = new EndGameController(text, board.getStatistics());
