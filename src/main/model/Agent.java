@@ -9,7 +9,7 @@ public class Agent {
     private static BoardItem scannedItem;
     private static ArrayList<Character> fronts = new ArrayList<>();
     private static int currRotate, currStepToBeacon, stepsToBeacon;
-    private static boolean foundUsefulBeacon = false, isBacktracking = false, goToTileOneOne = true, isGoBottomRight = false, isGoBottomLeft = false;
+    private static boolean goingDown = true, foundUsefulBeacon = false, isBacktracking = false;
 
     public static void addFront(char front) {
         fronts.add(front);
@@ -19,8 +19,8 @@ public class Agent {
         Agent.currStepToBeacon = currStepToBeacon;
     }
 
-    public static void setGoToTileOneOne(boolean goToTileOneOne) {
-        Agent.goToTileOneOne = goToTileOneOne;
+    public static void setGoingDown(boolean goingDown) {
+        Agent.goingDown = goingDown;
     }
 
     public static void setStepsToBeacon(int stepsToBeacon) {
@@ -63,8 +63,8 @@ public class Agent {
         return stepsToBeacon;
     }
 
-    public static boolean isGoToTileOneOne() {
-        return goToTileOneOne;
+    public static boolean isGoingDown() {
+        return goingDown;
     }
 
     public static boolean isFoundUsefulBeacon() {

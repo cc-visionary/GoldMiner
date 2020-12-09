@@ -28,25 +28,23 @@ final public class Miner extends BoardItem {
      */
     public void front() {
         ArrayList<ArrayList<BoardSpace>> aBoard = board.getBoard();
-        switch(this.direction) {
-            case 'r':
-                if(getXPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos() + 1, getYPos(), false);
-                else System.out.println("Can't move 1 step right ward");
-                break;
-            case 'l':
-                if(getXPos() - 1 >= 0) board.moveBoardItem(this, getXPos() - 1, getYPos(), false);
-                else System.out.println("Can't move 1 step left ward");
-                break;
-            case 'u':
-                if(getYPos() - 1 >= 0) board.moveBoardItem(this, getXPos(), getYPos() - 1, false);
-                else System.out.println("Can't move 1 step upward");
-                break;
-            case 'd':
-                if(getYPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos(), getYPos() + 1, false);
-                else System.out.println("Can't move 1 step downward");
-                break;
-        }
-        board.getStatistics().addFront();
+        if(canFront()) {
+            switch(this.direction) {
+                case 'r':
+                    if(getXPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos() + 1, getYPos(), false);
+                    break;
+                case 'l':
+                    if(getXPos() - 1 >= 0) board.moveBoardItem(this, getXPos() - 1, getYPos(), false);
+                    break;
+                case 'u':
+                    if(getYPos() - 1 >= 0) board.moveBoardItem(this, getXPos(), getYPos() - 1, false);
+                    break;
+                case 'd':
+                    if(getYPos() + 1 < aBoard.size()) board.moveBoardItem(this, getXPos(), getYPos() + 1, false);
+                    break;
+            }
+            board.getStatistics().addFront();
+        } else System.out.println("Can't move 1 step forward.");
     }
 
     private boolean canFront() {
@@ -112,7 +110,7 @@ final public class Miner extends BoardItem {
                 }
                 break;
             case 'd':
-                if(getYPos() + 1 < board.getBoard().size() - 1)  {
+                if(getYPos() + 1 < board.getBoard().size())  {
                     for(BoardItem boardItem : board.getBoard().get(getYPos() + 1).get(getXPos()).getBoardItems()) {
                         result = boardItem;
                         break;
@@ -128,7 +126,7 @@ final public class Miner extends BoardItem {
                 }
                 break;
             case 'r':
-                if(getXPos() + 1 < board.getBoard().size() - 1) {
+                if(getXPos() + 1 < board.getBoard().size()) {
                     for(BoardItem boardItem : board.getBoard().get(getYPos()).get(getXPos() + 1).getBoardItems()) {
                         result = boardItem;
                         break;
@@ -211,7 +209,6 @@ final public class Miner extends BoardItem {
                 } else Agent.setScannedItem(boardItem);
             } else doNormalRoutine();
         } else {
-            BoardItem boardItem;
             if(Agent.getScannedItem() instanceof GoldPot) front();
             else if(Agent.getScannedItem() instanceof Pit) goOverThePit();
             else if(Agent.getScannedItem() instanceof Beacon) {
@@ -228,6 +225,7 @@ final public class Miner extends BoardItem {
                         else canGetStepsToGoldPot = true;
                         break;
                 }
+                // limits steps to check only upto the number of space the useful beacon is from the gold pot
                 if(canGetStepsToGoldPot) {
                     if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) {
                         Agent.getFronts().clear();
@@ -286,40 +284,96 @@ final public class Miner extends BoardItem {
     }
 
     private void doNormalRoutine() {
-        BoardItem boardItem;
+        BoardItem boardItem = null;
         if(Agent.getCurrRotate() == 4) {
             Agent.setCurrRotate(0);
             if(!canFront()) {
+                switch (direction) {
+                    case 'r':
+                        faceUp();
+                        if(!canFront()) Agent.setGoingDown(true);
+                        faceDown();
+                        if(!canFront()) Agent.setGoingDown(false);
+                        faceRight();
+                        break;
+                    case 'l':
+                        faceUp();
+                        if(!canFront()) Agent.setGoingDown(true);
+                        faceDown();
+                        if(!canFront()) Agent.setGoingDown(false);
+                        faceLeft();
+                        break;
+                }
                 switch(direction) {
                     case 'r':
-                        faceDown();
-                        boardItem = scan();
-                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
-                        else front();
+                        // goes up or down depending on Agent.isGoingDown flag
+                        if(Agent.isGoingDown()) faceDown();
+                        else faceUp();
 
                         boardItem = scan();
-                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
-                        else front();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
                         faceLeft();
                         break;
                     case 'l':
-                        faceDown();
-                        boardItem = scan();
-                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
-                        else front();
+                        // goes up or down depending on Agent.isGoingDown flag
+                        if(Agent.isGoingDown()) faceDown();
+                        else faceUp();
 
                         boardItem = scan();
-                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
-                        else front();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
+                        else if(boardItem instanceof Beacon) {
+                            if(((Beacon) boardItem).isActivated()) front();
+                            else Agent.setScannedItem(boardItem);
+                        } else front();
                         faceRight();
                         break;
                     case 'u':
+                        faceRight();
+                        if(!canFront()) faceLeft();
                     case 'd':
-                        rotate();
-                        rotate();
+                        faceLeft();
+                        if(!canFront()) faceRight();
                         break;
                 }
-            } else front();
+            } else {
+                boardItem = scan();
+                if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                    Agent.setScannedItem(boardItem);
+                    return;
+                } else front();
+            }
         } else {
             Agent.setCurrRotate(Agent.getCurrRotate() + 1);
             rotate();
@@ -364,8 +418,8 @@ final public class Miner extends BoardItem {
         switch (direction) {
             case 'r':
                 faceUp();
-                if (canFront()) {
-                    boardItem = scan();
+                boardItem = scan();
+                if (canFront() && !(boardItem instanceof Pit)) {
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -387,7 +441,24 @@ final public class Miner extends BoardItem {
 
                     faceDown();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceRight();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceDown();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -419,7 +490,24 @@ final public class Miner extends BoardItem {
 
                     faceUp();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceRight();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceUp();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -430,8 +518,8 @@ final public class Miner extends BoardItem {
                 break;
             case 'l':
                 faceUp();
-                if (canFront()) {
-                    boardItem = scan();
+                boardItem = scan();
+                if (canFront() && !(boardItem instanceof Pit)) {
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -453,7 +541,24 @@ final public class Miner extends BoardItem {
 
                     faceDown();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceLeft();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceDown();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -485,7 +590,24 @@ final public class Miner extends BoardItem {
 
                     faceUp();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceLeft();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceUp();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -495,8 +617,8 @@ final public class Miner extends BoardItem {
                 }
             case 'u':
                 faceLeft();
-                if (canFront()) {
-                    boardItem = scan();
+                boardItem = scan();
+                if (canFront() && !(boardItem instanceof Pit)) {
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -518,7 +640,24 @@ final public class Miner extends BoardItem {
 
                     faceRight();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceUp();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceRight();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -550,7 +689,24 @@ final public class Miner extends BoardItem {
 
                     faceLeft();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceUp();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceLeft();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -561,8 +717,8 @@ final public class Miner extends BoardItem {
                 break;
             case 'd':
                 faceLeft();
-                if (canFront()) {
-                    boardItem = scan();
+                boardItem = scan();
+                if (canFront() && !(boardItem instanceof Pit)) {
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -584,7 +740,24 @@ final public class Miner extends BoardItem {
 
                     faceRight();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceDown();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceRight();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
@@ -616,7 +789,24 @@ final public class Miner extends BoardItem {
 
                     faceLeft();
 
-                    boardItem = scan();
+                    // move forward until it can pass through the pit
+                    do {
+                        // scan
+                        boardItem = scan();
+                        // if it scans a pit
+                        if(boardItem instanceof Pit) {
+                            // face to usual direction again and move forward
+                            faceDown();
+                            boardItem = scan();
+                            if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                                Agent.setScannedItem(boardItem);
+                                return;
+                            } else front();
+                        }
+                        faceLeft();
+                        boardItem = scan();
+                    } while(boardItem instanceof Pit);
+
                     if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
                         Agent.setScannedItem(boardItem);
                         return;
