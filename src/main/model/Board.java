@@ -44,7 +44,7 @@ public class Board {
                 if(r == 0 && c == 0) this.board.get(r).add(new BoardSpace(this.miner, c, r));
                 else if (inList(r * n + c, itemPositions.get(0))) this.board.get(r).add(new BoardSpace(this.goldPot, c, r));
                 else if(inList(r * n + c, itemPositions.get(1))) {
-                    Beacon beacon = new Beacon(c, r, this.goldPot.getXPos(), this.goldPot.getYPos());
+                    Beacon beacon = new Beacon(c, r);
                     this.board.get(r).add(new BoardSpace(beacon, c, r));
                     this.beacons.add(beacon);
                 } else if(inList(r * n + c, itemPositions.get(2))) {
@@ -97,6 +97,9 @@ public class Board {
                             }
                             if(hasPitInBetween) ((Beacon) boardItem).setStepsToGoldPot(-1);
                             else ((Beacon) boardItem).setStepsToGoldPot(Math.abs(beacon.getXPos() - this.goldPot.getXPos()) - 1);
+                        } else {
+                            // if x pos or y pos of beacon not the same with gold pot
+                            ((Beacon) boardItem).setStepsToGoldPot(-1);
                         }
                     }
                 }

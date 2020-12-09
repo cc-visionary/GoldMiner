@@ -187,13 +187,17 @@ final public class Miner extends BoardItem {
         if(Agent.getScannedItem() == null) {
             BoardItem boardItem = scan();
             if(Agent.isFoundUsefulBeacon()) {
-                if(boardItem instanceof Pit || !canFront()) Agent.setIsBacktracking(true);
+                if(boardItem instanceof Pit || !canFront() || Agent.getCurrStepToBeacon() > Agent.getStepsToBeacon()) {
+                    Agent.setIsBacktracking(true);
+                    Agent.setCurrStepToBeacon(0);
+                }
                 // optional: backtrack in specific number of steps (value returned by the beacon)
                 if(!canFront() && Agent.getFronts().size() == 0) {
                     rotate();
                     rotate();
                 } else if(Agent.isBacktracking()) backtrack();
                 else {
+                    Agent.setCurrStepToBeacon(Agent.getCurrStepToBeacon() + 1);
                     front();
                     Agent.addFront(direction);
                 }
@@ -201,45 +205,121 @@ final public class Miner extends BoardItem {
                 if(boardItem instanceof Beacon) {
                     if(!((Beacon) boardItem).isActivated()) Agent.setScannedItem(boardItem);
                     else doNormalRoutine();
+                } else if(boardItem instanceof Pit) {
+                    if(Agent.getCurrRotate() == 0)  Agent.setScannedItem(boardItem);
+                    else doNormalRoutine();
                 } else Agent.setScannedItem(boardItem);
             } else doNormalRoutine();
         } else {
+            BoardItem boardItem;
             if(Agent.getScannedItem() instanceof GoldPot) front();
-            else if(Agent.getScannedItem() instanceof Pit) {
-//                rotate();
-                Agent.setScannedItem(null);
-            } else if(Agent.getScannedItem() instanceof Beacon) {
+            else if(Agent.getScannedItem() instanceof Pit) goOverThePit();
+            else if(Agent.getScannedItem() instanceof Beacon) {
+                boolean canGetStepsToGoldPot = false;
                 switch (direction) {
                     case 'u':
                     case 'd':
                         if(Math.abs(Agent.getScannedItem().getYPos() - getYPos()) > 0) front();
-                        else {
-                            if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) Agent.setFoundUsefulBeacon(true);
-                            Agent.getFronts().clear();
-                            ((Beacon) Agent.getScannedItem()).setActivated(true);
-                            Agent.setScannedItem(null);
-                        }
+                        else canGetStepsToGoldPot = true;
                         break;
                     case 'l':
                     case 'r':
                         if(Math.abs(Agent.getScannedItem().getXPos() - getXPos()) > 0) front();
-                        else {
-                            if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) Agent.setFoundUsefulBeacon(true);
-                            Agent.getFronts().clear();
-                            ((Beacon) Agent.getScannedItem()).setActivated(true);
-                            Agent.setScannedItem(null);
-                        }
+                        else canGetStepsToGoldPot = true;
                         break;
+                }
+                if(canGetStepsToGoldPot) {
+                    if(((Beacon) Agent.getScannedItem()).getStepsToGoldPot() != -1) {
+                        Agent.getFronts().clear();
+                        Agent.setStepsToBeacon(((Beacon) Agent.getScannedItem()).getStepsToGoldPot());
+                        Agent.setFoundUsefulBeacon(true);
+                    }
+                    ((Beacon) Agent.getScannedItem()).setActivated(true);
+                    Agent.setScannedItem(null);
                 }
             }
         }
     }
 
+    private void faceUp() {
+        switch (direction) {
+            case 'r':
+                rotate();
+            case 'd':
+                rotate();
+            case 'l':
+                rotate();
+        }
+    }
+
+    private void faceLeft() {
+        switch (direction) {
+            case 'u':
+                rotate();
+            case 'r':
+                rotate();
+            case 'd':
+                rotate();
+        }
+    }
+
+    private void faceRight() {
+        switch (direction) {
+            case 'd':
+                rotate();
+            case 'l':
+                rotate();
+            case 'u':
+                rotate();
+        }
+    }
+
+    private void faceDown() {
+        switch (direction) {
+            case 'l':
+                rotate();
+            case 'u':
+                rotate();
+            case 'r':
+                rotate();
+        }
+    }
+
     private void doNormalRoutine() {
+        BoardItem boardItem;
         if(Agent.getCurrRotate() == 4) {
             Agent.setCurrRotate(0);
-            if(!canFront()) rotate();
-            else front();
+            if(!canFront()) {
+                switch(direction) {
+                    case 'r':
+                        faceDown();
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
+                        else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
+                        else front();
+                        faceLeft();
+                        break;
+                    case 'l':
+                        faceDown();
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
+                        else front();
+
+                        boardItem = scan();
+                        if(boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon) Agent.setScannedItem(boardItem);
+                        else front();
+                        faceRight();
+                        break;
+                    case 'u':
+                    case 'd':
+                        rotate();
+                        rotate();
+                        break;
+                }
+            } else front();
         } else {
             Agent.setCurrRotate(Agent.getCurrRotate() + 1);
             rotate();
@@ -250,6 +330,7 @@ final public class Miner extends BoardItem {
         if(Agent.getFronts().size() > 0) {
             boolean canFront = false;
             int lastIndex = Agent.getFronts().size() - 1;
+            // go to opposite direction
             switch(Agent.getFronts().get(lastIndex)) {
                 case 'u':
                     if(direction != 'd') rotate();
@@ -276,6 +357,276 @@ final public class Miner extends BoardItem {
             rotate();
             Agent.setIsBacktracking(false);
         }
+    }
+
+    private void goOverThePit() {
+        BoardItem boardItem;
+        switch (direction) {
+            case 'r':
+                faceUp();
+                if (canFront()) {
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+                } else {
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+                }
+                break;
+            case 'l':
+                faceUp();
+                if (canFront()) {
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+                } else {
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+                }
+            case 'u':
+                faceLeft();
+                if (canFront()) {
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+                } else {
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceUp();
+                }
+                break;
+            case 'd':
+                faceLeft();
+                if (canFront()) {
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+                } else {
+                    faceRight();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceLeft();
+
+                    boardItem = scan();
+                    if (boardItem instanceof GoldPot || boardItem instanceof Pit || boardItem instanceof Beacon || !canFront()) {
+                        Agent.setScannedItem(boardItem);
+                        return;
+                    } else front();
+
+                    faceDown();
+                }
+                break;
+        }
+        Agent.setScannedItem(null);
     }
 
     public char getDirection() {

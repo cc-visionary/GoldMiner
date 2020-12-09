@@ -190,8 +190,7 @@ public class EditBoardController implements Initializable {
      * @param index
      * @param newValue
      */
-    public void onValueChange(int index, String newValue) {
-        System.out.println(index + "-" + newValue);
+    public void onValueChange(int index, String newValue) { 
         int newXPos = Integer.parseInt(newValue.split(", ")[0]) - 1;
         int newYPos = Integer.parseInt(newValue.split(", ")[1]) - 1;
 

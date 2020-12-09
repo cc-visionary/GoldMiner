@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -35,6 +36,9 @@ public class GameScreenController implements Initializable {
     private Button scanButton, frontButton, rotateButton, nextButton;
 
     @FXML
+    private Label scanLabel, rotateLabel, frontLabel;
+
+    @FXML
     private CheckBox autoSkipCheckbox;
 
     @FXML
@@ -51,6 +55,7 @@ public class GameScreenController implements Initializable {
         this.choice = choice;
         this.board = board;
         this.board.verifyBeacons();
+        System.out.println(this.board.getGoldPot().getXPos() + " " + this.board.getGoldPot().getYPos());
     }
 
     @Override
@@ -93,6 +98,9 @@ public class GameScreenController implements Initializable {
             }
         }
         grid.setGridLinesVisible(true);
+        scanLabel.setText("Scan: " + board.getStatistics().getNScan());
+        rotateLabel.setText("Rotate: " + board.getStatistics().getNRotate());
+        frontLabel.setText("Front: " + board.getStatistics().getNFront());
 
         if(board.getMiner().didFallOnPit()) {
             // show game over screen

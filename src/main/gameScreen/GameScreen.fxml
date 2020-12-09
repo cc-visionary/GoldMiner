@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="ap" maxHeight="720.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -12,6 +13,18 @@
          </content></ScrollPane>
       <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
+            <Label fx:id="scanLabel" text="Scans: 0">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <Label fx:id="rotateLabel" layoutX="10.0" layoutY="10.0" text="Rotates: 0">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <Label fx:id="frontLabel" layoutX="10.0" layoutY="10.0" text="Front: 0">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
             <Button fx:id="scanButton" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scan" text="Scan" />
             <Button fx:id="rotateButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#rotate" text="Rotate" />
             <Button fx:id="frontButton" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#front" text="Front" />

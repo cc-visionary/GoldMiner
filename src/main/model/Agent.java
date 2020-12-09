@@ -8,11 +8,23 @@ import java.util.Map;
 public class Agent {
     private static BoardItem scannedItem;
     private static ArrayList<Character> fronts = new ArrayList<>();
-    private static int currRotate;
-    private static boolean foundUsefulBeacon = false, isBacktracking = false;
+    private static int currRotate, currStepToBeacon, stepsToBeacon;
+    private static boolean foundUsefulBeacon = false, isBacktracking = false, goToTileOneOne = true, isGoBottomRight = false, isGoBottomLeft = false;
 
     public static void addFront(char front) {
         fronts.add(front);
+    }
+
+    public static void setCurrStepToBeacon(int currStepToBeacon) {
+        Agent.currStepToBeacon = currStepToBeacon;
+    }
+
+    public static void setGoToTileOneOne(boolean goToTileOneOne) {
+        Agent.goToTileOneOne = goToTileOneOne;
+    }
+
+    public static void setStepsToBeacon(int stepsToBeacon) {
+        Agent.stepsToBeacon = stepsToBeacon;
     }
 
     public static void setScannedItem(BoardItem scannedItem) {
@@ -41,6 +53,18 @@ public class Agent {
 
     public static int getCurrRotate() {
         return currRotate;
+    }
+
+    public static int getCurrStepToBeacon() {
+        return currStepToBeacon;
+    }
+
+    public static int getStepsToBeacon() {
+        return stepsToBeacon;
+    }
+
+    public static boolean isGoToTileOneOne() {
+        return goToTileOneOne;
     }
 
     public static boolean isFoundUsefulBeacon() {
