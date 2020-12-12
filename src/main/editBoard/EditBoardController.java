@@ -195,7 +195,7 @@ public class EditBoardController implements Initializable {
         int newYPos = Integer.parseInt(newValue.split(", ")[1]) - 1;
 
         if(index < board.getBeacons().size()) board.moveBoardItem(board.getBeacons().get(index), newXPos, newYPos, true);
-        else if(index < board.getBeacons().size() + board.getPits().size()) board.moveBoardItem(board.getPits().get(index - board.getPits().size()), newXPos, newYPos, true);
+        else if(index < board.getBeacons().size() + board.getPits().size()) board.moveBoardItem(board.getPits().get(index - board.getBeacons().size()), newXPos, newYPos, true);
         else board.moveBoardItem(board.getGoldPot(), newXPos, newYPos, true);
 
         refresh();
