@@ -463,8 +463,6 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceRight();
                 } else {
                     faceDown();
 
@@ -512,9 +510,8 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceRight();
                 }
+                faceRight();
                 break;
             case 'l':
                 faceUp();
@@ -541,6 +538,8 @@ final public class Miner extends BoardItem {
 
                     faceDown();
 
+                    System.out.println("Direction left when going over the pit");
+
                     // move forward until it can pass through the pit
                     do {
                         // scan
@@ -563,8 +562,6 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceLeft();
                 } else {
                     faceDown();
 
@@ -612,9 +609,9 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceLeft();
                 }
+                faceLeft();
+                break;
             case 'u':
                 faceLeft();
                 boardItem = scan();
@@ -662,8 +659,6 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceUp();
                 } else {
                     faceRight();
 
@@ -711,9 +706,8 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceUp();
                 }
+                faceUp();
                 break;
             case 'd':
                 faceLeft();
@@ -762,8 +756,6 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceDown();
                 } else {
                     faceRight();
 
@@ -811,9 +803,8 @@ final public class Miner extends BoardItem {
                         Agent.setScannedItem(boardItem);
                         return;
                     } else front();
-
-                    faceDown();
                 }
+                faceDown();
                 break;
         }
         Agent.setScannedItem(null);
