@@ -324,12 +324,6 @@ final public class Miner extends BoardItem {
                             else Agent.setScannedItem(boardItem);
                         } else front();
 
-                        boardItem = scan();
-                        if(boardItem instanceof GoldPot || boardItem instanceof Pit) Agent.setScannedItem(boardItem);
-                        else if(boardItem instanceof Beacon) {
-                            if(((Beacon) boardItem).isActivated()) front();
-                            else Agent.setScannedItem(boardItem);
-                        } else front();
                         faceLeft();
                         break;
                     case 'l':
